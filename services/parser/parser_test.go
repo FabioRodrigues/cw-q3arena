@@ -46,7 +46,7 @@ func TestParserEventMatcher(t *testing.T) {
 		parser := New()
 		event, _, err := parser.Parse("Fake event")
 		assert.Equal(t, events.EventUnknown, event)
-		assert.Error(t, err)
+		assert.NoError(t, err)
 
 	})
 }

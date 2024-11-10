@@ -5,6 +5,7 @@ import (
 	"cw-q3arena/entities"
 	"cw-q3arena/reportmodels"
 	"cw-q3arena/services"
+	"encoding/json"
 	"errors"
 	"sync"
 )
@@ -95,4 +96,20 @@ func (s *RankingSubscriber) GetReport(gameId string) ([]reportmodels.RankingRepo
 	}
 
 	return ranking, nil
+}
+
+func (s *RankingSubscriber) GetSerializedReport(gameId string) (string, error) {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+	report, err := s.GetReport(gameId)
+	if err != nil {
+		return "", err
+	}
+
+	result, err := json.Marshal(report)
+	if err != nil {
+		return "", err
+	}
+
+	return string(result), nil
 }

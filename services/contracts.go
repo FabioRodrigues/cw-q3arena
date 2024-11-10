@@ -12,3 +12,7 @@ type Parser interface {
 type Sorter interface {
 	SortRankings(rankings []reportmodels.RankingReport) []reportmodels.RankingReport
 }
+
+type GameProcessor interface {
+	ProcessGame(gameId string, game []string) reportmodels.ProcessorReport
+}

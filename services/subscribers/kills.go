@@ -3,6 +3,7 @@ package subscribers
 import (
 	"cw-q3arena/entities"
 	"cw-q3arena/reportmodels"
+	"encoding/json"
 	"errors"
 	"sync"
 )
@@ -51,4 +52,18 @@ func (s *KillSubscriber) GetReport(gameId string) (reportmodels.KillReport, erro
 
 	return report, nil
 
+}
+
+func (s *KillSubscriber) GetSerializedReport(gameId string) (string, error) {
+	report, err := s.GetReport(gameId)
+	if err != nil {
+		return "", err
+	}
+
+	result, err := json.Marshal(report)
+	if err != nil {
+		return "", err
+	}
+
+	return string(result), nil
 }

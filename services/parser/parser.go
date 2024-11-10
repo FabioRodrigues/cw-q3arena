@@ -8,6 +8,7 @@ import (
 	"errors"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 func New() services.Parser {
@@ -25,10 +26,14 @@ func (p Parser) Parse(line string) (events.EventType, any, error) {
 		return event, result, err
 	}
 
-	return events.EventUnknown, nil, errors.New("unknown event")
+	return events.EventUnknown, nil, nil
 }
 
 func (p Parser) tryParseKill(line string) (events.EventType, any, error) {
+	if line = strings.TrimSpace(line); line == "" {
+		return events.EventUnknown, nil, errors.New("empty line")
+	}
+
 	if p.killRegex.Match([]byte(line)) {
 		matches := p.killRegex.FindStringSubmatch(line)
 		if len(matches) != 8 {
