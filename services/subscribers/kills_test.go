@@ -9,7 +9,7 @@ import (
 
 func TestKillsReport(t *testing.T) {
 	t.Run("should add initial kill data", func(t *testing.T) {
-		subscriber := New()
+		subscriber := NewKillSubscriber()
 
 		subscriber.Receive("game_1", entities.Kill{
 			Timestamp:  "2:22",
@@ -31,7 +31,7 @@ func TestKillsReport(t *testing.T) {
 	})
 
 	t.Run("should accumulate game kill events", func(t *testing.T) {
-		subscriber := New()
+		subscriber := NewKillSubscriber()
 
 		subscriber.Receive("game_1", entities.Kill{
 			Timestamp:  "2:22",
@@ -64,7 +64,7 @@ func TestKillsReport(t *testing.T) {
 	})
 
 	t.Run("should not add world as a player", func(t *testing.T) {
-		subscriber := New()
+		subscriber := NewKillSubscriber()
 
 		subscriber.Receive("game_1", entities.Kill{
 			Timestamp:  "2:22",
@@ -97,7 +97,7 @@ func TestKillsReport(t *testing.T) {
 	})
 
 	t.Run("should not mix game events", func(t *testing.T) {
-		subscriber := New()
+		subscriber := NewKillSubscriber()
 
 		subscriber.Receive("game_1", entities.Kill{
 			Timestamp:  "2:22",
@@ -129,7 +129,7 @@ func TestKillsReport(t *testing.T) {
 	})
 
 	t.Run("should not return negative kills if world kills more than the player kills", func(t *testing.T) {
-		subscriber := New()
+		subscriber := NewKillSubscriber()
 
 		subscriber.Receive("game_1", entities.Kill{
 			Timestamp:  "2:22",
@@ -170,7 +170,7 @@ func TestKillsReport(t *testing.T) {
 	})
 
 	t.Run("should return no data when no events received", func(t *testing.T) {
-		subscriber := New()
+		subscriber := NewKillSubscriber()
 
 		report, err := subscriber.GetReport("game_1")
 

@@ -12,7 +12,7 @@ type KillSubscriber struct {
 	db  map[string]reportmodels.KillReport
 }
 
-func New() *KillSubscriber {
+func NewKillSubscriber() *KillSubscriber {
 	return &KillSubscriber{
 		mux: &sync.Mutex{},
 		db:  map[string]reportmodels.KillReport{},
