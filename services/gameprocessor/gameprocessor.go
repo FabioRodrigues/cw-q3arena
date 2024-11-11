@@ -35,11 +35,13 @@ func NewGameProcessor(
 	}
 }
 
+// ProcessGame receives a full game to process
 func (p GameProcessor) ProcessGame(gameId string, game []string) reportmodels.ProcessorReport {
 
 	var wg sync.WaitGroup
 	lineChan := make(chan string, 3)
 
+	// We parallelize the event triggering by 3 works (no strong reason for 3 workers, just a number that came to my mind)
 	for i := 0; i < 3; i++ {
 		go func() {
 			for line := range lineChan {

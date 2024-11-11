@@ -11,6 +11,7 @@ func NewSortService() services.Sorter {
 
 type Sorter struct{}
 
+// SortRankings is a very simple implementation of a quicksort for sorting the rankings within a game (desc order)
 func (s Sorter) SortRankings(rankings []reportmodels.RankingReport) []reportmodels.RankingReport {
 	if len(rankings) < 2 {
 		return rankings

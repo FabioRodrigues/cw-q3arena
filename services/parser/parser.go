@@ -22,6 +22,8 @@ type Parser struct {
 }
 
 func (p Parser) Parse(line string) (events.EventType, any, error) {
+	// Ideally we could have a factory here, in case many different events being triggered.
+	// Not the case for the current moment, tho.
 	if event, result, err := p.tryParseKill(line); err == nil {
 		return event, result, err
 	}
@@ -29,6 +31,7 @@ func (p Parser) Parse(line string) (events.EventType, any, error) {
 	return events.EventUnknown, nil, nil
 }
 
+// This could be in a EventKillParser Factory. Not needed atm
 func (p Parser) tryParseKill(line string) (events.EventType, any, error) {
 	if line = strings.TrimSpace(line); line == "" {
 		return events.EventUnknown, nil, errors.New("empty line")

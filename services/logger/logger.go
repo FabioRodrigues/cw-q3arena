@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// Logger is an extremely simple & silly log implementation, just to give an idea of a logger
 type Logger struct{}
 
 func NewLogger() services.Logger {

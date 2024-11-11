@@ -27,6 +27,8 @@ func NewLoaderService(
 	}
 }
 
+// Load loads the game log and process game-by-game.
+// We don't parallelize all the games processing due to being memory-conservative
 func (s *LoaderService) Load(path string) (string, error) {
 	currentDir, err := s.ioAdapter.Getwd()
 	if err != nil {
@@ -44,7 +46,7 @@ func (s *LoaderService) Load(path string) (string, error) {
 	scanner := bufio.NewScanner(file)
 
 	// We process game by game to save memory space
-	// That's the same reason why we don't load the whole log in memory
+	// That's the same reason why we don't load the whole log into memory
 	gameId := 1
 	for scanner.Scan() {
 		text := scanner.Text()
