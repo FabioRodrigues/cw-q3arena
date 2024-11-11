@@ -48,6 +48,8 @@ func (s *LoaderService) Load(path string) (string, error) {
 	gameId := 1
 	for scanner.Scan() {
 		text := scanner.Text()
+
+		// using a simple string match here since regex would slow us down for no clear benefit
 		if len(text) > 7 && strings.HasPrefix(text[7:], "InitGame:") {
 			s.gamesReports = append(s.gamesReports, s.gameProcesor.ProcessGame(fmt.Sprintf("game_%d", gameId), game))
 
@@ -68,9 +70,9 @@ func (s *LoaderService) Load(path string) (string, error) {
 
 		gameData := map[string]map[string]any{
 			report.Game: {
-				"kill_data":        map[string]any{},
-				"rank_data":        []map[string]any{},
-				"death_cause_data": map[string]any{},
+				"kill_data":      map[string]any{},
+				"rank_data":      []map[string]any{},
+				"kills_by_means": map[string]any{},
 			},
 		}
 
@@ -83,7 +85,7 @@ func (s *LoaderService) Load(path string) (string, error) {
 		}
 
 		if report.DeathCauseReport != nil {
-			gameData[report.Game]["death_cause_data"] = report.DeathCauseReport
+			gameData[report.Game]["kills_by_means"] = report.DeathCauseReport
 		}
 
 		result = append(result, gameData)
