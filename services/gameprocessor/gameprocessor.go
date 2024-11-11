@@ -71,18 +71,18 @@ func (p GameProcessor) ProcessGame(gameId string, game []string) reportmodels.Pr
 
 	killReport, err := p.killSubscriber.GetData(gameId)
 	if err != nil {
-		p.loggerService.Info("no kill reports found for game", gameId)
+		p.loggerService.Info("no kill reports found for game ", gameId)
 
 	}
 
 	rankingReport, err := p.rankingSubscriber.GetData(gameId)
 	if err != nil {
-		p.loggerService.Info("no ranking reports found for game", gameId)
+		p.loggerService.Info("no ranking reports found for game ", gameId)
 	}
 
 	deathCauseReport, err := p.deathCauseSubscriber.GetData(gameId)
 	if err != nil {
-		p.loggerService.Info("no ranking reports found for game", gameId)
+		p.loggerService.Info("no death cause reports found for game ", gameId)
 	}
 
 	return reportmodels.ProcessorReport{

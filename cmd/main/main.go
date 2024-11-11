@@ -11,6 +11,7 @@ import (
 	"fmt"
 )
 
+// Entrypoint of the application
 func main() {
 	loggerService := logger.NewLogger()
 	loggerService.Info("Starting the app")

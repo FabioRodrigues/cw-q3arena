@@ -1,5 +1,7 @@
 package reportmodels
 
+import "cw-q3arena/constants"
+
 // KillReport consolidates all the Kill events for a specific report
 type KillReport struct {
 	TotalKills int            `json:"total_kills"`
@@ -15,7 +17,7 @@ func (k *KillReport) AddPlayers(players map[int]string) {
 	}
 
 	for id, name := range players {
-		if name == "<world>" {
+		if name == constants.WorldUsername {
 			continue
 		}
 		k.playersMap[id] = name
@@ -33,7 +35,7 @@ func (k *KillReport) AddKill(killerId int, killerName string, victimId int) {
 	}
 
 	k.TotalKills += 1
-	if killerName == "<world>" {
+	if killerName == constants.WorldUsername {
 		kills, _ := k.killsMap[victimId]
 		k.killsMap[victimId] = kills - 1
 		return
