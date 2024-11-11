@@ -16,3 +16,8 @@ type Sorter interface {
 type GameProcessor interface {
 	ProcessGame(gameId string, game []string) reportmodels.ProcessorReport
 }
+
+type Logger interface {
+	Info(args ...interface{})
+	Error(args ...interface{})
+}

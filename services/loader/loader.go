@@ -5,6 +5,7 @@ import (
 	"cw-q3arena/infra"
 	"cw-q3arena/reportmodels"
 	"cw-q3arena/services"
+	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -61,12 +62,32 @@ func (s *LoaderService) Load(path string) (string, error) {
 		return "", err
 	}
 
-	results := []string{}
+	result := []map[string]map[string]any{}
 
 	for _, report := range s.gamesReports {
-		if report.KillReport != "" {
-			results = append(results, fmt.Sprintf(`{"%s":%s}`, report.Game, report.KillReport))
+
+		gameData := map[string]map[string]any{
+			report.Game: {
+				"kill_data": map[string]any{},
+				"rank_data": nil,
+			},
 		}
+
+		if report.KillReport != nil {
+			gameData[report.Game]["kill_data"] = report.KillReport[report.Game]
+		}
+
+		if report.RankinReport != nil {
+			gameData[report.Game]["rank_data"] = report.RankinReport[report.Game]
+		}
+
+		result = append(result, gameData)
 	}
-	return fmt.Sprintf("[%s]", strings.Join(results, ",\n")), nil
+
+	report, err := json.Marshal(result)
+	if err != nil {
+		return "", err
+	}
+
+	return string(report), nil
 }

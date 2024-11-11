@@ -9,21 +9,21 @@ import (
 func TestQuickSort(t *testing.T) {
 	t.Run("should sort", func(t *testing.T) {
 		rankings := []reportmodels.RankingReport{
-			{"e", 5, 5},
-			{"b", 2, 2},
-			{"d", 4, 4},
-			{"a", 1, 1},
-			{"c", 3, 3},
+			{PlayerName: "e", PlayerId: 5, Kills: 5},
+			{PlayerName: "b", PlayerId: 2, Kills: 2},
+			{PlayerName: "d", PlayerId: 4, Kills: 4},
+			{PlayerName: "a", PlayerId: 1, Kills: 1},
+			{PlayerName: "c", PlayerId: 3, Kills: 3},
 		}
 
 		sorted := NewSortService().SortRankings(rankings)
 
 		assert.Equal(t, []reportmodels.RankingReport{
-			{"e", 5, 5},
-			{"d", 4, 4},
-			{"c", 3, 3},
-			{"b", 2, 2},
-			{"a", 1, 1},
+			{PlayerName: "e", PlayerId: 5, Kills: 5},
+			{PlayerName: "d", PlayerId: 4, Kills: 4},
+			{PlayerName: "c", PlayerId: 3, Kills: 3},
+			{PlayerName: "b", PlayerId: 2, Kills: 2},
+			{PlayerName: "a", PlayerId: 1, Kills: 1},
 		}, sorted)
 	})
 }

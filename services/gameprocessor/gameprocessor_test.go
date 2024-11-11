@@ -1,6 +1,7 @@
 package gameprocessor
 
 import (
+	"cw-q3arena/services/logger"
 	"cw-q3arena/services/parser"
 	"cw-q3arena/services/sorter"
 	"cw-q3arena/services/subscribers"
@@ -11,9 +12,11 @@ import (
 
 func TestGameProcessor(t *testing.T) {
 	t.Run("should process game", func(t *testing.T) {
+		parserService := parser.New()
+		loggerService := logger.NewLogger()
 		killSubscriber := subscribers.NewKillSubscriber()
 		rankingSubscriber := subscribers.NewRankingSubscriber(sorter.NewSortService())
-		processor := NewGameProcessor(parser.New(), killSubscriber, rankingSubscriber)
+		processor := NewGameProcessor(loggerService, parserService, killSubscriber, rankingSubscriber)
 
 		result := processor.ProcessGame("game_1", getGameLines())
 		assert.Equal(t, "game_1", result.Game)

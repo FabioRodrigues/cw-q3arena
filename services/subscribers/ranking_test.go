@@ -42,9 +42,9 @@ func TestRankingSubscriber(t *testing.T) {
 		report, err := subscriber.GetReport("game_1")
 		assert.NoError(t, err)
 		assert.Equal(t, []reportmodels.RankingReport{
-			{"Isgalamido", 1, 2},
-			{"Dono da bola", 2, 1},
-			{"Fabio", 3, 0},
+			{PlayerName: "Isgalamido", PlayerId: 1, Kills: 2},
+			{PlayerName: "Dono da bola", PlayerId: 2, Kills: 1},
+			{PlayerName: "Fabio", PlayerId: 3},
 		}, report)
 	})
 
@@ -91,7 +91,7 @@ func TestRankingSubscriber(t *testing.T) {
 		report, err := subscriber.GetReport("game_1")
 		assert.NoError(t, err)
 		assert.Len(t, report, 3)
-		assert.Equal(t, reportmodels.RankingReport{"Isgalamido", 1, 2}, report[0])
+		assert.Equal(t, reportmodels.RankingReport{PlayerName: "Isgalamido", PlayerId: 1, Kills: 2}, report[0])
 		assert.Equal(t, 0, report[1].Kills)
 		assert.Equal(t, 0, report[2].Kills)
 	})

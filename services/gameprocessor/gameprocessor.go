@@ -5,11 +5,11 @@ import (
 	"cw-q3arena/reportmodels"
 	"cw-q3arena/services"
 	"cw-q3arena/services/subscribers"
-	"fmt"
 	"sync"
 )
 
 type GameProcessor struct {
+	loggerService     services.Logger
 	parser            services.Parser
 	killSubscriber    subscribers.Subscriber
 	rankingSubscriber subscribers.Subscriber
@@ -17,10 +17,12 @@ type GameProcessor struct {
 }
 
 func NewGameProcessor(
+	loggerService services.Logger,
 	parser services.Parser,
 	killSubscriber subscribers.Subscriber,
 	rankingSubscriber subscribers.Subscriber) *GameProcessor {
 	return &GameProcessor{
+		loggerService: loggerService,
 		subscribers: map[events.EventType][]subscribers.Subscriber{
 			events.EventKill: {killSubscriber, rankingSubscriber},
 		},
@@ -40,7 +42,7 @@ func (p GameProcessor) ProcessGame(gameId string, game []string) reportmodels.Pr
 			for line := range lineChan {
 				event, data, err := p.parser.Parse(line)
 				if err != nil {
-					fmt.Println("Error parsing line", line, err)
+					p.loggerService.Error(err)
 					continue
 				}
 
@@ -64,15 +66,15 @@ func (p GameProcessor) ProcessGame(gameId string, game []string) reportmodels.Pr
 	wg.Wait()
 	close(lineChan)
 
-	killReport, err := p.killSubscriber.GetSerializedReport(gameId)
+	killReport, err := p.killSubscriber.GetData(gameId)
 	if err != nil {
-		fmt.Println("Error getting report", err)
+		p.loggerService.Info("no kill reports found for game", gameId)
 
 	}
 
-	rankingReport, err := p.rankingSubscriber.GetSerializedReport(gameId)
+	rankingReport, err := p.rankingSubscriber.GetData(gameId)
 	if err != nil {
-		fmt.Println("Error getting report", err)
+		p.loggerService.Info("no ranking reports found for game", gameId)
 	}
 
 	return reportmodels.ProcessorReport{
