@@ -2,7 +2,6 @@ package subscribers
 
 import (
 	"cw-q3arena/entities"
-	"cw-q3arena/reportmodels"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -21,12 +20,14 @@ func TestKillsReport(t *testing.T) {
 			MethodId:   10,
 		})
 
-		report, err := subscriber.GetReport("game_1")
+		report, err := subscriber.GetData("game_1")
 
 		assert.NoError(t, err)
-		assert.Equal(t, 1, report.TotalKills)
-		assert.Equal(t, 2, len(report.Players))
-		assert.Equal(t, map[string]int{"Isgalamido": 1}, report.Kills)
+		totalKills, kills, players := getReportData(report, "game_1")
+
+		assert.Equal(t, 1, totalKills)
+		assert.Equal(t, 2, len(players))
+		assert.Equal(t, map[string]int{"Isgalamido": 1}, kills)
 
 	})
 
@@ -53,13 +54,14 @@ func TestKillsReport(t *testing.T) {
 			MethodId:   10,
 		})
 
-		report, err := subscriber.GetReport("game_1")
+		report, err := subscriber.GetData("game_1")
+		totalKills, kills, players := getReportData(report, "game_1")
 
 		assert.NoError(t, err)
-		assert.Equal(t, 2, report.TotalKills)
-		assert.Equal(t, 3, len(report.Players))
-		assert.Equal(t, 1, report.Kills["Isgalamido"])
-		assert.Equal(t, 1, report.Kills["Fabio"])
+		assert.Equal(t, 2, totalKills)
+		assert.Equal(t, 3, len(players))
+		assert.Equal(t, 1, kills["Isgalamido"])
+		assert.Equal(t, 1, kills["Fabio"])
 
 	})
 
@@ -86,13 +88,14 @@ func TestKillsReport(t *testing.T) {
 			MethodId:   10,
 		})
 
-		report, err := subscriber.GetReport("game_1")
+		report, err := subscriber.GetData("game_1")
+		totalKills, kills, players := getReportData(report, "game_1")
 
 		assert.NoError(t, err)
-		assert.Equal(t, 2, report.TotalKills)
-		assert.Equal(t, 2, len(report.Players))
+		assert.Equal(t, 2, totalKills)
+		assert.Equal(t, 2, len(players))
 		// 0 because World has killed him. So -1 kill
-		assert.Equal(t, map[string]int{"Isgalamido": 0}, report.Kills)
+		assert.Equal(t, map[string]int{"Isgalamido": 0}, kills)
 
 	})
 
@@ -119,12 +122,13 @@ func TestKillsReport(t *testing.T) {
 			MethodId:   10,
 		})
 
-		report, err := subscriber.GetReport("game_1")
+		report, err := subscriber.GetData("game_1")
+		totalKills, kills, players := getReportData(report, "game_1")
 
 		assert.NoError(t, err)
-		assert.Equal(t, 1, report.TotalKills)
-		assert.Equal(t, 2, len(report.Players))
-		assert.Equal(t, map[string]int{"Isgalamido": 1}, report.Kills)
+		assert.Equal(t, 1, totalKills)
+		assert.Equal(t, 2, len(players))
+		assert.Equal(t, map[string]int{"Isgalamido": 1}, kills)
 
 	})
 
@@ -160,23 +164,33 @@ func TestKillsReport(t *testing.T) {
 			MethodId:   10,
 		})
 
-		report, err := subscriber.GetReport("game_1")
+		report, err := subscriber.GetData("game_1")
+		totalKills, kills, players := getReportData(report, "game_1")
 
 		assert.NoError(t, err)
-		assert.Equal(t, 3, report.TotalKills)
-		assert.Equal(t, 2, len(report.Players))
-		assert.Equal(t, map[string]int{"Isgalamido": 0}, report.Kills)
+		assert.Equal(t, 3, totalKills)
+		assert.Equal(t, 2, len(players))
+		assert.Equal(t, map[string]int{"Isgalamido": 0}, kills)
 
 	})
 
 	t.Run("should return no data when no events received", func(t *testing.T) {
 		subscriber := NewKillSubscriber()
 
-		report, err := subscriber.GetReport("game_1")
+		report, err := subscriber.GetData("game_1")
 
-		assert.Equal(t, reportmodels.KillReport{}, report)
+		assert.Len(t, report, 0)
 		assert.Error(t, err)
 		assert.Equal(t, "report not found", err.Error())
 
 	})
+}
+
+func getReportData(report map[string]any, gameId string) (int, map[string]int, []string) {
+	result := report[gameId].(map[string]interface{})
+	totalKills := result["total_kills"].(int)
+	kills := result["kills"].(map[string]int)
+	players := result["players"].([]string)
+
+	return totalKills, kills, players
 }

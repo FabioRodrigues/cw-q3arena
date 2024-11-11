@@ -37,6 +37,7 @@ func TestLoader(t *testing.T) {
 		svc := NewLoaderService(ioadapter.NewIOAdapter(), gameProcessor)
 		result, err := svc.Load("../../seed/seed_test.txt")
 		assert.NoError(t, err)
+		// Not validating the actual output since we have enough tests validating the output
 		assert.NotEmpty(t, result)
 	})
 
@@ -58,6 +59,8 @@ func TestLoader(t *testing.T) {
 		}
 
 		index := 0
+		// Mocking stdlib IO so that we can play with different log data without having to make IO calls nor
+		// having different files
 		mockIo := ioadapter.Mock{
 			OpenFn: func(name string) (io.ReadCloser, error) {
 				return &ioadapter.MockReadCloser{
@@ -85,5 +88,39 @@ func TestLoader(t *testing.T) {
 		killData := game["kill_data"].(map[string]interface{})
 		players := killData["players"].([]interface{})
 		assert.Len(t, players, 2)
+	})
+
+	t.Run("should not return reports in case of invalid game", func(t *testing.T) {
+		processGameCalled := false
+
+		gameProcessor := gameprocessor.Mock{
+			ProcessGameFn: func(gameId string, game []string) reportmodels.ProcessorReport {
+				processGameCalled = true
+				return reportmodels.ProcessorReport{
+					Game: gameId,
+					KillReport: map[string]any{
+						gameId: map[string]any{
+							"players": []string{"Isgalamido", "Zeh"},
+						},
+					},
+				}
+			},
+		}
+
+		mockIo := ioadapter.Mock{
+			OpenFn: func(name string) (io.ReadCloser, error) {
+				return &ioadapter.MockReadCloser{
+					ReadFn: func(p []byte) (n int, err error) {
+						return 0, io.EOF
+					},
+				}, nil
+			},
+		}
+		svc := NewLoaderService(mockIo, gameProcessor)
+		result, err := svc.Load("")
+		assert.NoError(t, err)
+		assert.False(t, processGameCalled)
+		assert.Equal(t, "[]", result)
+
 	})
 }

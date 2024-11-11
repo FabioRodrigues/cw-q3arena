@@ -39,7 +39,7 @@ func (s *KillSubscriber) Receive(gameId string, data any) {
 	s.db[gameId] = report
 }
 
-func (s *KillSubscriber) GetReport(gameId string) (reportmodels.KillReport, error) {
+func (s *KillSubscriber) getReport(gameId string) (reportmodels.KillReport, error) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 	report, found := s.db[gameId]
@@ -54,7 +54,7 @@ func (s *KillSubscriber) GetReport(gameId string) (reportmodels.KillReport, erro
 }
 
 func (s *KillSubscriber) GetData(gameId string) (map[string]any, error) {
-	report, err := s.GetReport(gameId)
+	report, err := s.getReport(gameId)
 	if err != nil {
 		return nil, err
 	}

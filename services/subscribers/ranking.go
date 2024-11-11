@@ -80,7 +80,7 @@ func (s *RankingSubscriber) Receive(gameId string, data any) {
 
 }
 
-func (s *RankingSubscriber) GetReport(gameId string) ([]reportmodels.RankingReport, error) {
+func (s *RankingSubscriber) getReport(gameId string) ([]reportmodels.RankingReport, error) {
 	db, found := s.db[gameId]
 	if !found {
 		return nil, errors.New("game not found")
@@ -100,7 +100,7 @@ func (s *RankingSubscriber) GetReport(gameId string) ([]reportmodels.RankingRepo
 func (s *RankingSubscriber) GetData(gameId string) (map[string]any, error) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
-	report, err := s.GetReport(gameId)
+	report, err := s.getReport(gameId)
 	if err != nil {
 		return nil, err
 	}

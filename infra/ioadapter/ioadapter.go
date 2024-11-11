@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 )
 
+// IOAdapter Has no tests since this is a wrapper for stdlib IO
 type IOAdapter struct {
 }
 

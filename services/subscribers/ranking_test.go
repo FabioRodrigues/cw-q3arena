@@ -39,13 +39,15 @@ func TestRankingSubscriber(t *testing.T) {
 			MethodId:   10,
 		})
 
-		report, err := subscriber.GetReport("game_1")
+		report, err := subscriber.GetData("game_1")
+		ranking := report["game_1"].([]reportmodels.RankingReport)
+
 		assert.NoError(t, err)
 		assert.Equal(t, []reportmodels.RankingReport{
 			{PlayerName: "Isgalamido", PlayerId: 1, Kills: 2},
 			{PlayerName: "Dono da bola", PlayerId: 2, Kills: 1},
 			{PlayerName: "Fabio", PlayerId: 3},
-		}, report)
+		}, ranking)
 	})
 
 	t.Run("should get report ordered with world player", func(t *testing.T) {
@@ -88,12 +90,14 @@ func TestRankingSubscriber(t *testing.T) {
 			MethodId:   10,
 		})
 
-		report, err := subscriber.GetReport("game_1")
+		report, err := subscriber.GetData("game_1")
+		ranking := report["game_1"].([]reportmodels.RankingReport)
+
 		assert.NoError(t, err)
-		assert.Len(t, report, 3)
-		assert.Equal(t, reportmodels.RankingReport{PlayerName: "Isgalamido", PlayerId: 1, Kills: 2}, report[0])
-		assert.Equal(t, 0, report[1].Kills)
-		assert.Equal(t, 0, report[2].Kills)
+		assert.Len(t, ranking, 3)
+		assert.Equal(t, reportmodels.RankingReport{PlayerName: "Isgalamido", PlayerId: 1, Kills: 2}, ranking[0])
+		assert.Equal(t, 0, ranking[1].Kills)
+		assert.Equal(t, 0, ranking[2].Kills)
 	})
 
 	t.Run("should return error when no game found", func(t *testing.T) {
@@ -108,7 +112,7 @@ func TestRankingSubscriber(t *testing.T) {
 			MethodId:   10,
 		})
 
-		_, err := subscriber.GetReport("game_2")
+		_, err := subscriber.GetData("game_2")
 		assert.Error(t, err)
 		assert.Equal(t, "game not found", err.Error())
 	})

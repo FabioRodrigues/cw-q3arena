@@ -49,4 +49,12 @@ func TestParserEventMatcher(t *testing.T) {
 		assert.NoError(t, err)
 
 	})
+
+	t.Run("should return unknown when an error occurred while parsing", func(t *testing.T) {
+		parser := New()
+		event, _, err := parser.Parse("")
+		assert.Equal(t, events.EventUnknown, event)
+		assert.NoError(t, err)
+
+	})
 }

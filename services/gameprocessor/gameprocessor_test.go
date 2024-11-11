@@ -3,8 +3,8 @@ package gameprocessor
 import (
 	"cw-q3arena/services/logger"
 	"cw-q3arena/services/parser"
-	"cw-q3arena/services/sorter"
 	"cw-q3arena/services/subscribers"
+	"errors"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
@@ -12,11 +12,16 @@ import (
 
 func TestGameProcessor(t *testing.T) {
 	t.Run("should process game", func(t *testing.T) {
-		parserService := parser.New()
-		loggerService := logger.NewLogger()
-		killSubscriber := subscribers.NewKillSubscriber()
-		rankingSubscriber := subscribers.NewRankingSubscriber(sorter.NewSortService())
-		deathCauseSubscriber := subscribers.NewDeathCauseSubscriber()
+		getDataFn := func(gameId string) (map[string]any, error) {
+			return map[string]any{
+				"game_1": "content",
+			}, nil
+		}
+		parserService := parser.Mock{}
+		loggerService := logger.Mock{}
+		killSubscriber := subscribers.Mock{GetDataFn: getDataFn}
+		rankingSubscriber := subscribers.Mock{GetDataFn: getDataFn}
+		deathCauseSubscriber := subscribers.Mock{GetDataFn: getDataFn}
 
 		processor := NewGameProcessor(loggerService, parserService, killSubscriber, rankingSubscriber, deathCauseSubscriber)
 
@@ -24,7 +29,90 @@ func TestGameProcessor(t *testing.T) {
 		assert.Equal(t, "game_1", result.Game)
 		assert.NotEmpty(t, result.RankinReport)
 		assert.NotEmpty(t, result.KillReport)
+		assert.NotEmpty(t, result.DeathCauseReport)
 	})
+
+	t.Run("should not process game in case of no data", func(t *testing.T) {
+		getDataFn := func(gameId string) (map[string]any, error) {
+			return map[string]any{}, errors.New("game not found")
+		}
+		parserService := parser.Mock{}
+		loggerCalledCount := 0
+		loggerService := logger.Mock{
+			InfoFn: func(args ...interface{}) {
+				loggerCalledCount++
+			},
+		}
+		killSubscriber := subscribers.Mock{
+			GetDataFn: getDataFn,
+		}
+		rankingSubscriber := subscribers.Mock{GetDataFn: getDataFn}
+		deathCauseSubscriber := subscribers.Mock{GetDataFn: getDataFn}
+
+		processor := NewGameProcessor(loggerService, parserService, killSubscriber, rankingSubscriber, deathCauseSubscriber)
+
+		result := processor.ProcessGame("game_1", nil)
+		assert.Equal(t, "game_1", result.Game)
+		assert.Empty(t, result.RankinReport)
+		assert.Empty(t, result.KillReport)
+		assert.Empty(t, result.DeathCauseReport)
+		assert.Equal(t, 3, loggerCalledCount)
+	})
+
+	// table tests for some related scenarios
+	tests := []struct {
+		scenario    string
+		killData    map[string]any
+		rankingData map[string]any
+		deathData   map[string]any
+	}{
+		{
+			scenario:    "no killData",
+			killData:    nil,
+			rankingData: map[string]any{"a": "b"},
+			deathData:   map[string]any{"a": "b"},
+		}, {
+			scenario:    "no rankingData",
+			killData:    map[string]any{"a": "b"},
+			rankingData: nil,
+			deathData:   map[string]any{"a": "b"},
+		}, {
+			scenario:    "no deathData",
+			killData:    map[string]any{"a": "b"},
+			rankingData: map[string]any{"a": "b"},
+			deathData:   nil,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.scenario, func(t *testing.T) {
+			parserService := parser.Mock{}
+			loggerService := logger.Mock{}
+			killSubscriber := subscribers.Mock{
+				GetDataFn: func(gameId string) (map[string]any, error) {
+					return test.killData, nil
+				},
+			}
+			rankingSubscriber := subscribers.Mock{
+				GetDataFn: func(gameId string) (map[string]any, error) {
+					return test.rankingData, nil
+				},
+			}
+			deathCauseSubscriber := subscribers.Mock{
+				GetDataFn: func(gameId string) (map[string]any, error) {
+					return test.deathData, nil
+				},
+			}
+
+			processor := NewGameProcessor(loggerService, parserService, killSubscriber, rankingSubscriber, deathCauseSubscriber)
+
+			result := processor.ProcessGame("game_1", nil)
+			assert.Equal(t, "game_1", result.Game, test.scenario)
+			assert.Len(t, result.KillReport, len(test.killData), test.scenario)
+			assert.Len(t, result.RankinReport, len(test.rankingData), test.scenario)
+			assert.Len(t, result.DeathCauseReport, len(test.deathData), test.scenario)
+		})
+	}
 }
 
 func getGameLines() []string {
