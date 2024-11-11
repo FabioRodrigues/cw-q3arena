@@ -16,7 +16,9 @@ func TestGameProcessor(t *testing.T) {
 		loggerService := logger.NewLogger()
 		killSubscriber := subscribers.NewKillSubscriber()
 		rankingSubscriber := subscribers.NewRankingSubscriber(sorter.NewSortService())
-		processor := NewGameProcessor(loggerService, parserService, killSubscriber, rankingSubscriber)
+		deathCauseSubscriber := subscribers.NewDeathCauseSubscriber()
+
+		processor := NewGameProcessor(loggerService, parserService, killSubscriber, rankingSubscriber, deathCauseSubscriber)
 
 		result := processor.ProcessGame("game_1", getGameLines())
 		assert.Equal(t, "game_1", result.Game)

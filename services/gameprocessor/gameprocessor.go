@@ -9,26 +9,29 @@ import (
 )
 
 type GameProcessor struct {
-	loggerService     services.Logger
-	parser            services.Parser
-	killSubscriber    subscribers.Subscriber
-	rankingSubscriber subscribers.Subscriber
-	subscribers       map[events.EventType][]subscribers.Subscriber
+	loggerService        services.Logger
+	parser               services.Parser
+	killSubscriber       subscribers.Subscriber
+	rankingSubscriber    subscribers.Subscriber
+	deathCauseSubscriber subscribers.Subscriber
+	subscribers          map[events.EventType][]subscribers.Subscriber
 }
 
 func NewGameProcessor(
 	loggerService services.Logger,
 	parser services.Parser,
 	killSubscriber subscribers.Subscriber,
-	rankingSubscriber subscribers.Subscriber) *GameProcessor {
+	rankingSubscriber subscribers.Subscriber,
+	deathCauseSubscriber subscribers.Subscriber) *GameProcessor {
 	return &GameProcessor{
 		loggerService: loggerService,
 		subscribers: map[events.EventType][]subscribers.Subscriber{
-			events.EventKill: {killSubscriber, rankingSubscriber},
+			events.EventKill: {killSubscriber, rankingSubscriber, deathCauseSubscriber},
 		},
-		killSubscriber:    killSubscriber,
-		rankingSubscriber: rankingSubscriber,
-		parser:            parser,
+		killSubscriber:       killSubscriber,
+		rankingSubscriber:    rankingSubscriber,
+		deathCauseSubscriber: deathCauseSubscriber,
+		parser:               parser,
 	}
 }
 
@@ -77,9 +80,15 @@ func (p GameProcessor) ProcessGame(gameId string, game []string) reportmodels.Pr
 		p.loggerService.Info("no ranking reports found for game", gameId)
 	}
 
+	deathCauseReport, err := p.deathCauseSubscriber.GetData(gameId)
+	if err != nil {
+		p.loggerService.Info("no ranking reports found for game", gameId)
+	}
+
 	return reportmodels.ProcessorReport{
-		Game:         gameId,
-		KillReport:   killReport,
-		RankinReport: rankingReport,
+		Game:             gameId,
+		KillReport:       killReport,
+		RankinReport:     rankingReport,
+		DeathCauseReport: deathCauseReport,
 	}
 }

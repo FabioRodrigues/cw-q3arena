@@ -2,6 +2,7 @@ package ioadapter
 
 import (
 	"cw-q3arena/infra"
+	"io"
 	"os"
 	"path/filepath"
 )
@@ -21,6 +22,6 @@ func (a IOAdapter) Join(elem ...string) string {
 	return filepath.Join(elem...)
 }
 
-func (a IOAdapter) Open(name string) (*os.File, error) {
+func (a IOAdapter) Open(name string) (io.ReadCloser, error) {
 	return os.Open(name)
 }

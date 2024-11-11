@@ -1,9 +1,11 @@
 package infra
 
-import "os"
+import (
+	"io"
+)
 
 type IoAdapter interface {
 	Getwd() (dir string, err error)
 	Join(elem ...string) string
-	Open(name string) (*os.File, error)
+	Open(name string) (io.ReadCloser, error)
 }

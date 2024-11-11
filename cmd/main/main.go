@@ -19,8 +19,9 @@ func main() {
 
 	killSubscriber := subscribers.NewKillSubscriber()
 	rankingSubscriber := subscribers.NewRankingSubscriber(sorterService)
+	deathCauseSubscriber := subscribers.NewDeathCauseSubscriber()
 
-	gameProcessor := gameprocessor.NewGameProcessor(loggerService, parserService, killSubscriber, rankingSubscriber)
+	gameProcessor := gameprocessor.NewGameProcessor(loggerService, parserService, killSubscriber, rankingSubscriber, deathCauseSubscriber)
 
 	gameLoader := loader.NewLoaderService(ioadapter.NewIOAdapter(), gameProcessor)
 	result, err := gameLoader.Load("seed/seed.txt")
