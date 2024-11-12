@@ -4,28 +4,27 @@ import (
 	"cw-q3arena/events"
 	"cw-q3arena/reportmodels"
 	"cw-q3arena/services"
-	"cw-q3arena/services/subscribers"
 	"sync"
 )
 
 type GameProcessor struct {
 	loggerService        services.Logger
 	parser               services.Parser
-	killSubscriber       subscribers.Subscriber
-	rankingSubscriber    subscribers.Subscriber
-	deathCauseSubscriber subscribers.Subscriber
-	subscribers          map[events.EventType][]subscribers.Subscriber
+	killSubscriber       services.Subscriber
+	rankingSubscriber    services.Subscriber
+	deathCauseSubscriber services.Subscriber
+	subscribers          map[events.EventType][]services.Subscriber
 }
 
 func NewGameProcessor(
 	loggerService services.Logger,
 	parser services.Parser,
-	killSubscriber subscribers.Subscriber,
-	rankingSubscriber subscribers.Subscriber,
-	deathCauseSubscriber subscribers.Subscriber) *GameProcessor {
+	killSubscriber services.Subscriber,
+	rankingSubscriber services.Subscriber,
+	deathCauseSubscriber services.Subscriber) services.GameProcessor {
 	return &GameProcessor{
 		loggerService: loggerService,
-		subscribers: map[events.EventType][]subscribers.Subscriber{
+		subscribers: map[events.EventType][]services.Subscriber{
 			events.EventKill: {killSubscriber, rankingSubscriber, deathCauseSubscriber},
 		},
 		killSubscriber:       killSubscriber,

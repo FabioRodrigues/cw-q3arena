@@ -19,7 +19,7 @@ type LoaderService struct {
 func NewLoaderService(
 	ioAdapter infra.IoAdapter,
 	gameProcessor services.GameProcessor,
-) *LoaderService {
+) services.LoaderService {
 	return &LoaderService{
 		ioAdapter:    ioAdapter,
 		gamesReports: []reportmodels.ProcessorReport{},

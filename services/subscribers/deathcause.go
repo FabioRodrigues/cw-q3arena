@@ -2,6 +2,7 @@ package subscribers
 
 import (
 	"cw-q3arena/entities"
+	"cw-q3arena/services"
 	"errors"
 	"sync"
 )
@@ -11,7 +12,7 @@ type DeathCauseSubscriber struct {
 	db  map[string]map[string]int
 }
 
-func NewDeathCauseSubscriber() Subscriber {
+func NewDeathCauseSubscriber() services.Subscriber {
 	return &DeathCauseSubscriber{
 		mux: &sync.Mutex{},
 		db:  map[string]map[string]int{},

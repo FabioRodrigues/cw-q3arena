@@ -3,6 +3,7 @@ package subscribers
 import (
 	"cw-q3arena/entities"
 	"cw-q3arena/reportmodels"
+	"cw-q3arena/services"
 	"errors"
 	"sync"
 )
@@ -12,7 +13,7 @@ type KillSubscriber struct {
 	db  map[string]reportmodels.KillReport
 }
 
-func NewKillSubscriber() *KillSubscriber {
+func NewKillSubscriber() services.Subscriber {
 	return &KillSubscriber{
 		mux: &sync.Mutex{},
 		db:  map[string]reportmodels.KillReport{},

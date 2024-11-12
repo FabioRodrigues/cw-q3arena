@@ -20,7 +20,7 @@ type RankingSubscriber struct {
 	sorter services.Sorter
 }
 
-func NewRankingSubscriber(sorter services.Sorter) *RankingSubscriber {
+func NewRankingSubscriber(sorter services.Sorter) services.Subscriber {
 	return &RankingSubscriber{
 		mux:    &sync.Mutex{},
 		db:     map[string]RankingDatabaseModel{},
