@@ -70,5 +70,13 @@ cd cw-q3arena
 make run
 ```
 
+## Code coverage
+As this exercise does not require an integration with a coverage tool, here is the last state of the coverage in the code.
+My target is always as much as I can but sometimes chasing the coverage only for the sake of the coverage does not make sense.
+What makes more sense is testing the actual scenarios and the realistic edge cases.
+
+<img width="538" alt="image" src="https://github.com/user-attachments/assets/af9f8218-a03b-4fa7-bfb2-24d23da7001e">
+
+
 ## Examples
 [Here](https://gist.github.com/FabioRodrigues/34effb4931ce73eb7c2bcb8dae9cae3a) is an example of a real output of the application
