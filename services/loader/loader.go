@@ -2,6 +2,7 @@ package loader
 
 import (
 	"bufio"
+	"context"
 	"cw-q3arena/infra"
 	"cw-q3arena/reportmodels"
 	"cw-q3arena/services"
@@ -29,7 +30,7 @@ func NewLoaderService(
 
 // Load loads the game log and process game-by-game.
 // We don't parallelize all the games processing due to being memory-conservative
-func (s *LoaderService) Load(path string) (string, error) {
+func (s *LoaderService) Load(ctx context.Context, path string) (string, error) {
 	currentDir, err := s.ioAdapter.Getwd()
 	if err != nil {
 		return "", err
@@ -53,7 +54,7 @@ func (s *LoaderService) Load(path string) (string, error) {
 
 		// using a simple string match here since regex would slow us down for no clear benefit
 		if len(text) > 7 && strings.HasPrefix(text[7:], "InitGame:") {
-			s.gamesReports = append(s.gamesReports, s.gameProcesor.ProcessGame(fmt.Sprintf("game_%d", gameId), game))
+			s.gamesReports = append(s.gamesReports, s.gameProcesor.ProcessGame(ctx, fmt.Sprintf("game_%d", gameId), game))
 
 			game = []string{}
 			gameId += 1

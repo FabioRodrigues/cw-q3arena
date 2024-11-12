@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"cw-q3arena/events"
 	"cw-q3arena/reportmodels"
 )
@@ -14,11 +15,11 @@ type Sorter interface {
 }
 
 type GameProcessor interface {
-	ProcessGame(gameId string, game []string) reportmodels.ProcessorReport
+	ProcessGame(ctx context.Context, gameId string, game []string) reportmodels.ProcessorReport
 }
 
 type LoaderService interface {
-	Load(path string) (string, error)
+	Load(ctx context.Context, path string) (string, error)
 }
 
 type Logger interface {

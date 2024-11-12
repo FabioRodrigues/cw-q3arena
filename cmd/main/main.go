@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"cw-q3arena/infra/ioadapter"
 	"cw-q3arena/services/gameprocessor"
 	"cw-q3arena/services/loader"
@@ -13,8 +14,11 @@ import (
 
 // Entrypoint of the application
 func main() {
+	// initializing logger
 	loggerService := logger.NewLogger()
 	loggerService.Info("Starting the app")
+
+	// initializing services
 	sorterService := sorter2.NewSortService()
 	parserService := parser.New()
 
@@ -22,10 +26,12 @@ func main() {
 	rankingSubscriber := subscribers.NewRankingSubscriber(sorterService)
 	deathCauseSubscriber := subscribers.NewDeathCauseSubscriber()
 
+	ioAdapter := ioadapter.NewIOAdapter()
+
 	gameProcessor := gameprocessor.NewGameProcessor(loggerService, parserService, killSubscriber, rankingSubscriber, deathCauseSubscriber)
 
-	gameLoader := loader.NewLoaderService(ioadapter.NewIOAdapter(), gameProcessor)
-	result, err := gameLoader.Load("seed/seed.txt")
+	gameLoader := loader.NewLoaderService(ioAdapter, gameProcessor)
+	result, err := gameLoader.Load(context.Background(), "seed/seed.txt")
 	if err != nil {
 		loggerService.Error(err)
 	}

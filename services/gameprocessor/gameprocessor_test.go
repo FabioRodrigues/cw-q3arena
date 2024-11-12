@@ -1,6 +1,7 @@
 package gameprocessor
 
 import (
+	"context"
 	"cw-q3arena/services/logger"
 	"cw-q3arena/services/parser"
 	"cw-q3arena/services/subscribers"
@@ -25,7 +26,7 @@ func TestGameProcessor(t *testing.T) {
 
 		processor := NewGameProcessor(loggerService, parserService, killSubscriber, rankingSubscriber, deathCauseSubscriber)
 
-		result := processor.ProcessGame("game_1", getGameLines())
+		result := processor.ProcessGame(context.Background(), "game_1", getGameLines())
 		assert.Equal(t, "game_1", result.Game)
 		assert.NotEmpty(t, result.RankinReport)
 		assert.NotEmpty(t, result.KillReport)
@@ -51,7 +52,7 @@ func TestGameProcessor(t *testing.T) {
 
 		processor := NewGameProcessor(loggerService, parserService, killSubscriber, rankingSubscriber, deathCauseSubscriber)
 
-		result := processor.ProcessGame("game_1", nil)
+		result := processor.ProcessGame(context.Background(), "game_1", nil)
 		assert.Equal(t, "game_1", result.Game)
 		assert.Empty(t, result.RankinReport)
 		assert.Empty(t, result.KillReport)
@@ -106,7 +107,7 @@ func TestGameProcessor(t *testing.T) {
 
 			processor := NewGameProcessor(loggerService, parserService, killSubscriber, rankingSubscriber, deathCauseSubscriber)
 
-			result := processor.ProcessGame("game_1", nil)
+			result := processor.ProcessGame(context.Background(), "game_1", nil)
 			assert.Equal(t, "game_1", result.Game, test.scenario)
 			assert.Len(t, result.KillReport, len(test.killData), test.scenario)
 			assert.Len(t, result.RankinReport, len(test.rankingData), test.scenario)

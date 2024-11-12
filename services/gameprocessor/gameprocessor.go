@@ -1,6 +1,7 @@
 package gameprocessor
 
 import (
+	"context"
 	"cw-q3arena/events"
 	"cw-q3arena/reportmodels"
 	"cw-q3arena/services"
@@ -35,7 +36,7 @@ func NewGameProcessor(
 }
 
 // ProcessGame receives a full game to process
-func (p GameProcessor) ProcessGame(gameId string, game []string) reportmodels.ProcessorReport {
+func (p GameProcessor) ProcessGame(ctx context.Context, gameId string, game []string) reportmodels.ProcessorReport {
 
 	var wg sync.WaitGroup
 	lineChan := make(chan string, 3)
@@ -43,28 +44,43 @@ func (p GameProcessor) ProcessGame(gameId string, game []string) reportmodels.Pr
 	// We parallelize the event triggering by 3 works (no strong reason for 3 workers, just a number that came to my mind)
 	for i := 0; i < 3; i++ {
 		go func() {
-			for line := range lineChan {
-				event, data, err := p.parser.Parse(line)
-				if err != nil {
-					p.loggerService.Error(err)
-					continue
-				}
-
-				// Process the parsed event
-				subs, found := p.subscribers[event]
-				if found {
-					for _, subscriber := range subs {
-						subscriber.Receive(gameId, data)
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case line, ok := <-lineChan:
+					if !ok {
+						return
 					}
+
+					event, data, err := p.parser.Parse(line)
+					if err != nil {
+						p.loggerService.Error(err)
+						wg.Done() // Ensure wg.Done() is called even on error
+						continue
+					}
+
+					// Process the parsed event
+					subs, found := p.subscribers[event]
+					if found {
+						for _, subscriber := range subs {
+							subscriber.Receive(gameId, data)
+						}
+					}
+					wg.Done()
 				}
-				wg.Done()
 			}
 		}()
 	}
 
 	for _, line := range game {
-		wg.Add(1)
-		lineChan <- line
+		select {
+		case <-ctx.Done():
+			break
+		default:
+			wg.Add(1)
+			lineChan <- line
+		}
 	}
 
 	wg.Wait()

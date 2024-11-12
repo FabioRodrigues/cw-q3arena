@@ -2,6 +2,7 @@ package loader
 
 import (
 	"bytes"
+	"context"
 	"cw-q3arena/infra/ioadapter"
 	"cw-q3arena/reportmodels"
 	"cw-q3arena/services/gameprocessor"
@@ -35,7 +36,7 @@ func TestLoader(t *testing.T) {
 		gameProcessor := gameprocessor.NewGameProcessor(loggerService, parserService, killSubscriber, rankingSubscriber, deathCauseSubscriber)
 
 		svc := NewLoaderService(ioadapter.NewIOAdapter(), gameProcessor)
-		result, err := svc.Load("../../seed/seed_test.txt")
+		result, err := svc.Load(context.Background(), "../../seed/seed_test.txt")
 		assert.NoError(t, err)
 		// Not validating the actual output since we have enough tests validating the output
 		assert.NotEmpty(t, result)
@@ -45,7 +46,7 @@ func TestLoader(t *testing.T) {
 		processGameCalled := false
 
 		gameProcessor := gameprocessor.Mock{
-			ProcessGameFn: func(gameId string, game []string) reportmodels.ProcessorReport {
+			ProcessGameFn: func(ctx context.Context, gameId string, game []string) reportmodels.ProcessorReport {
 				processGameCalled = true
 				return reportmodels.ProcessorReport{
 					Game: gameId,
@@ -76,7 +77,7 @@ func TestLoader(t *testing.T) {
 			},
 		}
 		svc := NewLoaderService(mockIo, gameProcessor)
-		result, err := svc.Load("")
+		result, err := svc.Load(context.Background(), "")
 		assert.NoError(t, err)
 		assert.NotEmpty(t, result)
 		assert.True(t, processGameCalled)
@@ -94,7 +95,7 @@ func TestLoader(t *testing.T) {
 		processGameCalled := false
 
 		gameProcessor := gameprocessor.Mock{
-			ProcessGameFn: func(gameId string, game []string) reportmodels.ProcessorReport {
+			ProcessGameFn: func(ctx context.Context, gameId string, game []string) reportmodels.ProcessorReport {
 				processGameCalled = true
 				return reportmodels.ProcessorReport{
 					Game: gameId,
@@ -117,7 +118,7 @@ func TestLoader(t *testing.T) {
 			},
 		}
 		svc := NewLoaderService(mockIo, gameProcessor)
-		result, err := svc.Load("")
+		result, err := svc.Load(context.Background(), "")
 		assert.NoError(t, err)
 		assert.False(t, processGameCalled)
 		assert.Equal(t, "[]", result)
